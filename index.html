@@ -20,12 +20,12 @@
 
       <!-- We can define assets here to be loaded when A-Frame initializes -->
       <a-assets>
-        <!-- Credit to Poly by Google for the model: https://poly.google.com/view/6pwiq7hSrHr -->
-        <a-asset-item id="treeModel" src="tree.glb"></a-asset-item>
+				<img id="hearts-queen" src="images/hearts_queen.png"/>
       </a-assets>
 
       <!-- The raycaster will emit mouse events on scene objects specified with the cantap class -->
 			<a-camera
+				id="camera"
 				position="0 8 0"
 				raycaster="objects: .cantap"
 				cursor="
