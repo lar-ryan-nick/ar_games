@@ -15,13 +15,13 @@ AFRAME.registerComponent('tap-place', {
 			newElement.setAttribute('rotation', '0 ' + randomYRotation + ' 0')
 			*/
 			//newElement.setAttribute('visible', 'false')
-			newElement.object3D.scale.set(3, 3, 3)
+			newElement.object3D.scale.set(2, 2, 2)
 			// Rotate to orient with camera
 			const camera = document.getElementById('camera')
 			const yaw = camera.object3D.rotation.y
 			newElement.object3D.rotation.set(Math.PI / 2.0, 0, -yaw)
 
-			newElement.setAttribute('src', '#hearts-queen')
+			newElement.setAttribute('src', '#s_a')
 			this.el.sceneEl.appendChild(newElement)
 			/*
 			newElement.addEventListener('model-loaded', () => {
