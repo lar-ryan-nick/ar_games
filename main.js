@@ -75,4 +75,77 @@ function createDeck()
             }
         }
     }
+
+    function flipCards()
+    {
+        playersCard = players[0].Hand.pop();
+        computersCard = players[1].Hand.pop();
+
+        if(playersCard.weight == computersCard.weight) {
+            // If cards are the same rank begin a war and add the two cards to the pot
+            var warPot = new Array()
+            warPot.push(playersCard)
+            warPot.push(computersCard)
+            startWar(warPot)
+        } else if (playersCard.weight > computersCard.weight) {
+            // If the player has a higher rank card, add both cards to the bottom of their hand
+            players[0].Hand.push(playersCard)
+            players[0].Hand.push(computersCard)
+            checkForWinner()
+        } else {
+            // If the computer has a higher rank card, add both cards to the bottom of their hand
+            players[1].Hand.push(playersCard)
+            players[1].Hand.push(computersCard)
+            checkForWinner()
+        }
+    }
+
+    function startWar(warPot) {
+        // Check if both players have enough cards for the war
+        if(players[0].Hand.length < 2) {
+            // Computer wins
+        }
+        if(players[1].Hand.length < 2) {
+            // Player wins
+        }
+
+        playersCard = players[0].Hand.pop();
+        computersCard = players[1].Hand.pop();
+
+        // Add the face down cards to the pot
+        warPot.push(players[1].Hand.pop())
+        warPot.push(players[0].Hand.pop())
+
+        if(playersCard.weight == computersCard.weight) {
+            // If cards are the same rank continue the war and add the two cards to the pot
+            warPot.push(playersCard)
+            warPot.push(computersCard)
+            startWar(warPot)
+        } else if (playersCard.weight > computersCard.weight) {
+            // If the player has a higher rank card, add the pot to the bottom of their hand
+            players[0].Hand.concat(warPot)
+            checkForWinner()
+        } else {
+            // If the computer has a higher rank card, add the pot to the bottom of their hand
+            players[1].Hand.concat(warPot)
+            checkForWinner()
+        }
+    }
+
+    function checkForWinner() {
+        if(players[0].Hand.length == 52) {
+            //TODO: display player win
+        }
+        if(players[1].Hand.length == 52) {
+            //TODO: display computer win
+        }
+    }
+
+    window.addEventListener('load', function(){
+        createDeck();
+        shuffle();
+        createPlayers(1);
+    });
+
+
 }
