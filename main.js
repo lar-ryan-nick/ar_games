@@ -18,8 +18,8 @@ AFRAME.registerComponent('main', {
 				this.flipCards = this.flipCards.bind(this)
 				this.startWar = this.startWar.bind(this)
 				this.checkForWinner = this.checkForWinner.bind(this)
-				// TODO
-				//this.playCard = this.playCard.bind(this)
+				this.clearCards = this.clearCards.bind(this)
+				this.placeCard = this.placeCard.bind(this)
 
 				const playerTappable = document.getElementById('player-tappable')
 				playerTappable.addEventListener('click', function(event) {
@@ -60,9 +60,9 @@ AFRAME.registerComponent('main', {
         // for 1000 turns
         // switch the values of two random cards
         for (var i = 0; i < 1000; i++) {
-            var location1 = Math.floor((Math.random() * this.deck.length));
-            var location2 = Math.floor((Math.random() * this.deck.length));
-            var tmp = this.deck[location1];
+            const location1 = Math.floor((Math.random() * this.deck.length));
+            const location2 = Math.floor((Math.random() * this.deck.length));
+            const tmp = this.deck[location1];
 
             this.deck[location1] = this.deck[location2];
             this.deck[location2] = tmp;
@@ -87,7 +87,7 @@ AFRAME.registerComponent('main', {
 				// TODO: make work for more than 2 players?
         for (var i = 0; i < 26; i++) {
             for (var x = 0; x < this.players.length; x++) {
-                var card = this.deck.pop();
+                const card = this.deck.pop();
                 this.players[x].Hand.push(card);
                 //renderCard(card, x);
             }
@@ -95,23 +95,16 @@ AFRAME.registerComponent('main', {
     },
 
     flipCards: function() {
+				this.clearCards(this.playerTarget)
+				this.clearCards(this.computerTarget)
+
         playersCard = this.players[0].Hand.shift();
         computersCard = this.players[1].Hand.shift();
 
         console.log(playersCard)
 
-        const playerCurCard = document.createElement('a-image')
-        const computerCurCard = document.createElement('a-image')
-
-        console.log("#" + playersCard.Suit + "_" + playersCard.Value)
-        playerCurCard.object3D.scale.set(0.75, 0.75, 0.75)
-        computerCurCard.object3D.scale.set(0.75, 0.75, 0.75)
-        //playerCurCard.setAttribute("rotation", "90 90 90")
-        //computerCurCard.setAttribute("rotation", "90 90 90")
-        playerCurCard.setAttribute('src', "#" + playersCard.Suit + "_" + playersCard.Value.toLowerCase())
-        computerCurCard.setAttribute('src',"#" + computersCard.Suit + "_" + computersCard.Value.toLowerCase())
-        this.playerTarget.appendChild(playerCurCard)
-        this.computerTarget.appendChild(computerCurCard)
+				this.placeCard(this.playerTarget, playersCard, 0, false);
+				this.placeCard(this.computerTarget, computersCard, 0, false);
 
         if (playersCard.Weight == computersCard.Weight) {
             // If cards are the same rank begin a war and add the two cards to the pot
@@ -134,27 +127,44 @@ AFRAME.registerComponent('main', {
 				console.log(this.players[1].Hand)
     },
 
+		placeCard: function(target, card, offset, back) {
+        const image = document.createElement('a-image')
+        image.object3D.scale.set(0.75, 0.75, 0.75)
+        image.object3D.position.set(0, offset, offset)
+				if (!back) {
+					image.setAttribute('src', "#" + card.Suit + "_" + card.Value.toLowerCase())
+				} else {
+					image.setAttribute('src', "#back")
+				}
+        target.appendChild(image)
+		},
+
+		clearCards: function(target) {
+			target.querySelectorAll('a-image').forEach(element => {
+				console.log(element)
+				target.removeChild(element)
+			})
+		},
+
     startWar: function(warPot) {
         // Check if both players have enough cards for the war
-        if (this.players[0].Hand.length < 2) {
+        if (this.players[0].Hand.length < 3) {
             // Computer wins
-						this.playerText.setAttribute('text', 'You lost.')
+						this.playerText.setAttribute('value', 'Not enough cards for war. You lose.')
         }
-        if (this.players[1].Hand.length < 2) {
+        if (this.players[1].Hand.length < 3) {
             // Player wins
-						this.playerText.setAttribute('text', 'You won!')
+						this.playerText.setAttribute('value', 'Opponent ran out of cards for war. You won!')
         }
 
-				// Add the face down cards to the pot
-				warPot.push(this.players[0].Hand.shift())
-				warPot.push(this.players[1].Hand.shift())
-				warPot.push(this.players[0].Hand.shift())
-				warPot.push(this.players[1].Hand.shift())
-
-        const playersCard = this.players[0].Hand.shift();
-        const computersCard = this.players[1].Hand.shift();
-				warPot.push(playersCard)
-				warPot.push(computersCard)
+				for (var i = 0; i < 3; ++i) {
+					var playersCard = this.players[0].Hand.shift();
+					var computersCard = this.players[1].Hand.shift();
+					warPot.push(playersCard)
+					warPot.push(computersCard)
+					this.placeCard(this.playerTarget, playersCard, warPot.length / 2 * 0.1, i != 2);
+					this.placeCard(this.computerTarget, computersCard, warPot.length / 2 * 0.1, i != 2);
+				}
 
 				console.log('WAR!')
 				console.log(warPot)
@@ -176,11 +186,11 @@ AFRAME.registerComponent('main', {
     checkForWinner: function() {
         if (this.players[0].Hand.length == 52) {
             //TODO: display player win
-						this.playerText.setAttribute('text', 'You won!')
+						this.playerText.setAttribute('value', 'You won!')
         }
         if (this.players[1].Hand.length == 52) {
             //TODO: display computer win
-						this.playerText.setAttribute('text', 'You lost.')
+						this.playerText.setAttribute('value', 'You lost.')
         }
     }
 });
