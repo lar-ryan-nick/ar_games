@@ -15,7 +15,6 @@
 
 		<a-scene
 			xrweb
-			tap-place
 			main
 			xrextras-almost-there
 			xrextras-loading
@@ -85,7 +84,8 @@
 				raycaster="objects: .cantap"
 				cursor="
 					fuse: false;
-					rayOrigin: mouse;"></a-camera>
+					rayOrigin: mouse;">
+			</a-camera>
 
       <a-entity
         light="type: directional;
@@ -97,13 +97,16 @@
 
 			<!-- Note: "name:" must be set to the name of the image target uploaded to the 8th Wall Console -->
 			<a-entity xrextras-named-image-target="name: red_card"
-			id="player_card">
+			id="player_card" class=".cantap">
+				<a-text id="player-text" rotation="0 0 180" width=1 position="0.4 -0.5 0" color="black" value="Tap here to place a card from your deck"></a-text>
+				<a-box id="player-tappable" class="cantap" visible="false"></a-box>
 			</a-entity>
 			<a-entity xrextras-named-image-target="name: blue_card"
 			id="computer_card">
 			</a-entity>
 
       <!-- Adding the cantap class allows the ground to be clicked -->
+			<!--
 			<a-entity
 				id="ground"
 				class="cantap"
@@ -111,6 +114,7 @@
         geometry="primitive: box"
 				position="0 -1 0"
         material="color: #ffffff; transparent: true; opacity: 0.0"></a-entity>
+			-->
 		</a-scene>
 	</body>
 </html>
