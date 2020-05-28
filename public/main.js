@@ -4,7 +4,6 @@ var currentPlayer = 0;
 
 AFRAME.registerComponent('main', {
     init: function() {
-				console.log("INIT 1")
         this.playerTarget = document.getElementById('player_card')
         this.computerTarget = document.getElementById('computer_card')
         this.playerText = document.getElementById('player-text')
