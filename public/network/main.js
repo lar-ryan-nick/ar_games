@@ -4,6 +4,7 @@ var currentPlayer = 0;
 
 AFRAME.registerComponent('main', {
     init: function() {
+				this.socket = io.connect()
         this.playerTarget = document.getElementById('player_card')
         this.computerTarget = document.getElementById('computer_card')
         this.playerText = document.getElementById('player-text')
@@ -52,8 +53,6 @@ AFRAME.registerComponent('main', {
             this.players.push(player);
         }
     },
-
-
 
     shuffle: function() {
         // for 1000 turns
