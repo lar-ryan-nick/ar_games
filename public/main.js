@@ -12,6 +12,14 @@ AFRAME.registerComponent('main', {
         this.warStatus = false;
         this.warPot = new Array()
 
+        this.endGameText = document.createElement('a-text')
+        this.endGameText.setAttribute("rotation", "0 0 180")
+        this.endGameText.setAttribute("width", "5")
+        this.endGameText.setAttribute("height", "5")
+        this.endGameText.setAttribute("position", "0 0 0" )
+        this.endGameText.setAttribute("color", "black")
+        this.endGameText.setAttribute("align", "center")
+
         this.createDeck = this.createDeck.bind(this)
 				this.createPlayers = this.createPlayers.bind(this)
 				this.shuffle = this.shuffle.bind(this)
@@ -226,13 +234,19 @@ AFRAME.registerComponent('main', {
     },
 
     checkForWinner: function() {
-        if (this.players[0].Hand.length == 52) {
+        if (this.players[0].Hand.length > 0) {
+            this.clearCards(this.playerTarget)
+            this.clearCards(this.computerTarget)
             //TODO: display player win
-						this.playerText.setAttribute('value', 'You won!')
+            this.endGameText.setAttribute("value", "YOU WIN!!!")
+            this.playerTarget.appendChild(this.endGameText)
         }
         if (this.players[1].Hand.length == 52) {
+            this.clearCards(this.playerTarget)
+            this.clearCards(this.computerTarget)
             //TODO: display computer win
-						this.playerText.setAttribute('value', 'You lost.')
+            this.endGameText.setAttribute("value", "You Lost.")
+            this.playerTarget.appendChild(this.endGameText)
         }
     },
 
