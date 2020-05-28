@@ -7,10 +7,12 @@ const options = {
 }
 const https = require('https').createServer(options, app).listen(443);
 const io = require('socket.io')(https);
+const connections = [];
 
 app.use(express.static('public'));
 
 io.on('connection', (socket) => {
+	connections.push(socket);
 	console.log('A user connected to socket.io');
 	socket.on('disconnect', () => {
 		console.log('A user disconnected');
