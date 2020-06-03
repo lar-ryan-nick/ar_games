@@ -29,8 +29,8 @@ AFRAME.registerComponent('main', {
 				this.checkForWinner = this.checkForWinner.bind(this)
 				this.clearCards = this.clearCards.bind(this)
 				this.placeCard = this.placeCard.bind(this)
-                this.addCardCounter = this.addCardCounter.bind(this)
-
+				this.addCardCounter = this.addCardCounter.bind(this)
+				this.runAnimation = this.runAnimation.bind(this)
 				const playerTappable = document.getElementById('player-tappable')
 				playerTappable.addEventListener('click', function(event) {
 				    this.playerText.setAttribute("visible", "false")
@@ -41,7 +41,6 @@ AFRAME.registerComponent('main', {
                         this.startWar();
                     }
 				}.bind(this))
-
         this.startGame()
     },
 
@@ -274,16 +273,16 @@ AFRAME.registerComponent('main', {
 
     runAnimation: function(playerCard, computerCard) {
         this.playerShip = document.createElement('a-obj-model')
-        this.playerShip.setAttribute("src", "./models/tie_fighter.obj")
-        this.playerShip.setAttribute("mtl", "./models/tie_fighter.mtl")
+        this.playerShip.setAttribute("src", "#tie-fighter-obj")
+        this.playerShip.setAttribute("mtl", "#tie-fighter-mtl")
         this.playerShip.setAttribute("scale", ".15 .15 .15")
         this.playerShip.setAttribute("position", ".05 .1 .2")
         this.playerShip.setAttribute("rotation", "90 0 0")
         this.playerShip.setAttribute("animation__2", "property: visible; from: true; to: false; delay: 7000")
 
         this.computerShip = document.createElement('a-obj-model')
-        this.computerShip.setAttribute("src", "./models/tie_fighter.obj")
-        this.computerShip.setAttribute("mtl", "./models/tie_fighter.mtl")
+        this.computerShip.setAttribute("src", "#tie-fighter-obj")
+        this.computerShip.setAttribute("mtl", "#tie-fighter-mtl")
         this.computerShip.setAttribute("scale", ".15 .15 .15")
         this.computerShip.setAttribute("position", ".05 -1 .2")
         this.computerShip.setAttribute("rotation", "-90 0 0")

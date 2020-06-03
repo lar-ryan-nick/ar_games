@@ -9,6 +9,11 @@ const https = require('https').createServer(options, app).listen(443);
 const io = require('socket.io')(https);
 const connections = [];
 
+app.use((req, res, next) => {
+	console.log('Request for:', req.url);
+	next();
+});
+
 // Setup static file server
 app.use(express.static('public'));
 
