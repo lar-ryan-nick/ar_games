@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- <meta name="8thwall:renderer" content="aframe"> -->
+		<!-- <meta name="8thwall:package" content="@8thwall.xrextras"> -->
+    <script src="//cdn.8thwall.com/web/aframe/8frame-0.9.0.min.js"></script>
+    <script src="//cdn.8thwall.com/web/aframe/aframe-animation-component-5.1.2.min.js"></script>
+<!--		<script src="inflate.min.js"></script>-->
+<!--		<script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.0/dist/aframe-extras.min.js"></script>-->
+		<script defer src="//cdn.8thwall.com/web/xrextras/xrextras.js"></script>
+    <script async src="//apps.8thwall.com/xrweb?appKey=8a9T0pdZXDS9CDjehxaYQx9k4zKEQ1NZwAd9wxy4vUoPe3DTtOINTV5awxvCtQqGpUy61c"></script>
+		<script src="main.js" async defer></script>
+	</head>
+
+	<body>
+
+		<a-scene
+			xrweb
+			main
+			xrextras-almost-there
+			xrextras-loading
+			xrextras-runtime-error>
+
+      <!-- We can define assets here to be loaded when A-Frame initializes -->
+      <a-assets>
+		  <a-asset-item id="tie-fighter-obj" src="models/tie-fighter.obj"></a-asset-item>
+		  <a-asset-item id="tie-fighter-mtl" src="models/tie-fighter.mtl"></a-asset-item>
+				<img id="c_2" src="images/c_2.svg"/>
+				<img id="d_2" src="images/d_2.svg"/>
+				<img id="h_2" src="images/h_2.svg"/>
+				<img id="s_2" src="images/s_2.svg"/>
+				<img id="c_3" src="images/c_3.svg"/>
+				<img id="d_3" src="images/d_3.svg"/>
+				<img id="h_3" src="images/h_3.svg"/>
+				<img id="s_3" src="images/s_3.svg"/>
+				<img id="c_4" src="images/c_4.svg"/>
+				<img id="d_4" src="images/d_4.svg"/>
+				<img id="h_4" src="images/h_4.svg"/>
+				<img id="s_4" src="images/s_4.svg"/>
+				<img id="c_5" src="images/c_5.svg"/>
+				<img id="d_5" src="images/d_5.svg"/>
+				<img id="h_5" src="images/h_5.svg"/>
+				<img id="s_5" src="images/s_5.svg"/>
+				<img id="c_6" src="images/c_6.svg"/>
+				<img id="d_6" src="images/d_6.svg"/>
+				<img id="h_6" src="images/h_6.svg"/>
+				<img id="s_6" src="images/s_6.svg"/>
+				<img id="c_7" src="images/c_7.svg"/>
+				<img id="d_7" src="images/d_7.svg"/>
+				<img id="h_7" src="images/h_7.svg"/>
+				<img id="s_7" src="images/s_7.svg"/>
+				<img id="c_8" src="images/c_8.svg"/>
+				<img id="d_8" src="images/d_8.svg"/>
+				<img id="h_8" src="images/h_8.svg"/>
+				<img id="s_8" src="images/s_8.svg"/>
+				<img id="c_9" src="images/c_9.svg"/>
+				<img id="d_9" src="images/d_9.svg"/>
+				<img id="h_9" src="images/h_9.svg"/>
+				<img id="s_9" src="images/s_9.svg"/>
+				<img id="c_10" src="images/c_10.svg"/>
+				<img id="d_10" src="images/d_10.svg"/>
+				<img id="h_10" src="images/h_10.svg"/>
+				<img id="s_10" src="images/s_10.svg"/>
+				<img id="c_j" src="images/c_j.svg"/>
+				<img id="d_j" src="images/d_j.svg"/>
+				<img id="h_j" src="images/h_j.svg"/>
+				<img id="s_j" src="images/s_j.svg"/>
+				<img id="c_q" src="images/c_q.svg"/>
+				<img id="d_q" src="images/d_q.svg"/>
+				<img id="h_q" src="images/h_q.svg"/>
+				<img id="s_q" src="images/s_k.svg"/>
+				<img id="c_k" src="images/c_k.svg"/>
+				<img id="d_k" src="images/d_k.svg"/>
+				<img id="h_k" src="images/h_k.svg"/>
+				<img id="s_k" src="images/s_q.svg"/>
+				<img id="c_a" src="images/c_a.svg"/>
+				<img id="d_a" src="images/d_a.svg"/>
+				<img id="h_a" src="images/h_a.svg"/>
+				<img id="s_a" src="images/s_a.svg"/>
+				<img id="back" src="images/back.png"/>
+      </a-assets>
+
+      <!-- The raycaster will emit mouse events on scene objects specified with the cantap class -->
+			<a-camera
+				id="camera"
+				position="0 8 0"
+				raycaster="objects: .cantap"
+				cursor="
+					fuse: false;
+					rayOrigin: mouse;">
+			</a-camera>
+
+      <a-entity
+        light="type: directional;
+               intensity: 0.8;"
+        position="1 4.3 2.5"></a-entity>
+
+      <a-light type="ambient" intensity="1"></a-light>
+
+
+
+			<!-- Note: "name:" must be set to the name of the image target uploaded to the 8th Wall Console -->
+			<a-entity xrextras-named-image-target="name: red_card"
+			id="player_card" class=".cantap">
+<!--				<a-cylinder position=".1 0 .1" material="opacity: .8; color: green" height=".2" radius=".01"-->
+<!--							animation="property: position; to: .1 -1 .1; dur: 200; easing: linear; loop: true"></a-cylinder>-->
+<!--				<a-cylinder position="-.1 0 .1" material="opacity: .8; color: green" height=".2" radius=".01"-->
+<!--							animation="property: position; to: -.1 -1 .1; dur: 200; easing: linear; loop: true"></a-cylinder>-->
+<!--				<a-cylinder material="opacity: .8; color: green" height=".2" radius=".01"-->
+<!--				animation="property: position; dur: 1000; from: 0 0 0; to: 1 0 0">-->
+<!--&lt;!&ndash;					<a-animation attribute="position" dur="1000" from="0 0 0" to="10 10 10" repeat="indefinite"></a-animation>&ndash;&gt;-->
+<!--				</a-cylinder>-->
+<!--				<a-entity scale=".1 .1 .1" fbx-model="src: url(Punching.fbx);"></a-entity>-->
+<!--				<a-obj-model src="./models/tie_fighter.obj" mtl="./models/tie_fighter.mtl"-->
+<!--							scale=".2 .2 .2" position=".05 0 .2" rotation="90 0 0"></a-obj-model>-->
+				<a-text id="player-text" rotation="0 0 180" width=1 position="0.4 -0.5 0" color="black" value="Tap here to place a card from your deck"></a-text>
+				<a-box id="player-tappable" class="cantap" visible="false"></a-box>
+			</a-entity>
+			<a-entity xrextras-named-image-target="name: blue_card"
+			id="computer_card">
+			</a-entity>
+
+		</a-scene>
+	</body>
+</html>
