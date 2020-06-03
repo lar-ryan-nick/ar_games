@@ -2,43 +2,49 @@ var currentPlayer = 0;
 
 AFRAME.registerComponent('main', {
 	init: function() {
-				this.socket = io.connect('https://fog.mat.ucsb.edu')
-				this.socket.on('start', (data) => {
-				})
-				this.socket.on('opponent', (data) => {
-				})
 		this.playerTarget = document.getElementById('player_card')
 		this.computerTarget = document.getElementById('computer_card')
 		this.playerText = document.getElementById('player-text')
 
-				this.createDeck = this.createDeck.bind(this)
-				this.createPlayers = this.createPlayers.bind(this)
-				this.shuffle = this.shuffle.bind(this)
-				this.startGame = this.startGame.bind(this)
-				this.flipCards = this.flipCards.bind(this)
-				this.startWar = this.startWar.bind(this)
-				this.checkForWinner = this.checkForWinner.bind(this)
-				this.clearCards = this.clearCards.bind(this)
-				this.placeCard = this.placeCard.bind(this)
+		this.flipCards = this.flipCards.bind(this)
+		this.startWar = this.startWar.bind(this)
+		this.checkForWinner = this.checkForWinner.bind(this)
+		this.clearCards = this.clearCards.bind(this)
+		this.placeCard = this.placeCard.bind(this)
 
-				const playerTappable = document.getElementById('player-tappable')
-				playerTappable.addEventListener('click', function(event) {
-					this.flipCards();
-				}.bind(this))
-		this.startGame()
+		this.socket = io.connect('https://fog.mat.ucsb.edu')
+		this.socket.on('start', (data) => {
+		})
+		this.socket.on('opponent', (data) => {
+			if (data.clear) {
+				this.clearCards(this.playerTarget)
+				this.clearCards(this.computerTarget)
+			}
+			this.placeCard(this.computerTarget, data.card, data.offset, data.back);
+		})
+		this.socket.on('card', function(data) {
+			if (data.clear) {
+				this.clearCards(this.playerTarget)
+				this.clearCards(this.computerTarget)
+			}
+			this.placeCard(this.playerTarget, data.card, data.offset, data.back);
+		}.bind(this))
+
+		const playerTappable = document.getElementById('player-tappable')
+		playerTappable.addEventListener('click', function(event) {
+			this.socket.emit('card', {});
+		}.bind(this))
 	},
 
 	flipCards: function() {
-				this.clearCards(this.playerTarget)
-				this.clearCards(this.computerTarget)
 
 		playersCard = this.players[0].Hand.shift();
 		computersCard = this.players[1].Hand.shift();
 
 		console.log(playersCard)
 
-				this.placeCard(this.playerTarget, playersCard, 0, false);
-				this.placeCard(this.computerTarget, computersCard, 0, false);
+		this.placeCard(this.playerTarget, playersCard, 0, false);
+		this.placeCard(this.computerTarget, computersCard, 0, false);
 
 		if (playersCard.Weight == computersCard.Weight) {
 			// If cards are the same rank begin a war and add the two cards to the pot
