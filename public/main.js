@@ -20,6 +20,8 @@ AFRAME.registerComponent('main', {
         this.endGameText.setAttribute("color", "black")
         this.endGameText.setAttribute("align", "center")
 
+
+
         this.createDeck = this.createDeck.bind(this)
 				this.createPlayers = this.createPlayers.bind(this)
 				this.shuffle = this.shuffle.bind(this)
@@ -30,9 +32,11 @@ AFRAME.registerComponent('main', {
 				this.clearCards = this.clearCards.bind(this)
 				this.placeCard = this.placeCard.bind(this)
 				this.addCardCounter = this.addCardCounter.bind(this)
+                this.generateModels = this.generateModels.bind(this)
 				this.runAnimation = this.runAnimation.bind(this)
 				const playerTappable = document.getElementById('player-tappable')
 				playerTappable.addEventListener('click', function(event) {
+				    console.log("War Status: " + this.warStatus)
 				    this.playerText.setAttribute("visible", "false")
 
                     if(!this.warStatus) {
@@ -41,6 +45,8 @@ AFRAME.registerComponent('main', {
                         this.startWar();
                     }
 				}.bind(this))
+
+        this.generateModels()
         this.startGame()
     },
 
@@ -113,7 +119,7 @@ AFRAME.registerComponent('main', {
     flipCards: function() {
 				this.clearCards(this.playerTarget)
 				this.clearCards(this.computerTarget)
-        // this.addCardCounter()
+                this.addCardCounter()
 
         playersCard = this.players[0].Hand.shift();
         computersCard = this.players[1].Hand.shift();
@@ -174,9 +180,9 @@ AFRAME.registerComponent('main', {
 
 		clearCards: function(target) {
 			target.querySelectorAll('a-image').forEach(element => {
-				console.log(element)
-				target.removeChild(element)
-			})
+                console.log(element)
+                target.removeChild(element)
+            })
 		},
 
     startWar: function() {
@@ -271,66 +277,87 @@ AFRAME.registerComponent('main', {
         this.playerTarget.appendChild(this.cardCounter)
     },
 
-    runAnimation: function(playerCard, computerCard) {
+    generateModels: function () {
         this.playerShip = document.createElement('a-obj-model')
         this.playerShip.setAttribute("src", "#tie-fighter-obj")
         this.playerShip.setAttribute("mtl", "#tie-fighter-mtl")
         this.playerShip.setAttribute("scale", ".15 .15 .15")
         this.playerShip.setAttribute("position", ".05 .1 .2")
         this.playerShip.setAttribute("rotation", "90 0 0")
-        this.playerShip.setAttribute("animation__2", "property: visible; from: true; to: false; delay: 7000")
+        this.playerShip.setAttribute("visible", 'false')
 
         this.computerShip = document.createElement('a-obj-model')
         this.computerShip.setAttribute("src", "#tie-fighter-obj")
         this.computerShip.setAttribute("mtl", "#tie-fighter-mtl")
         this.computerShip.setAttribute("scale", ".15 .15 .15")
-        this.computerShip.setAttribute("position", ".05 -1 .2")
-        this.computerShip.setAttribute("rotation", "-90 0 0")
-        this.computerShip.setAttribute("animation__2", "property: visible; from: true; to: false; delay: 7000")
+        this.computerShip.setAttribute("position", "-.05 -.9 .2")
+        this.computerShip.setAttribute("rotation", "-90 0 180")
+        this.computerShip.setAttribute("visible", "false")
 
         this.RightBeam = document.createElement('a-cylinder')
         this.RightBeam.setAttribute("height", ".2")
         this.RightBeam.setAttribute("radius", ".01")
         this.RightBeam.setAttribute("visible", "false")
-        this.RightBeam.setAttribute("animation__2", "property: visible; from: false; to: true; delay: 2000")
-        this.RightBeam.setAttribute("animation__3", "property: visible; from: true; to: false; delay: 4000")
 
         this.LeftBeam = document.createElement('a-cylinder')
         this.LeftBeam.setAttribute("height", ".2")
         this.LeftBeam.setAttribute("radius", ".01")
         this.LeftBeam.setAttribute("visible", "false")
-        this.LeftBeam.setAttribute("animation__2", "property: visible; from: false; to: true; delay: 2000")
-        this.LeftBeam.setAttribute("animation__3", "property: visible; from: true; to: false; delay: 4000")
-
-        if(playerCard.Weight > computerCard.Weight) {
-            this.computerShip.setAttribute("animation__3", "property: visible; from: true; to: false; delay: 4000")
-
-            this.RightBeam.setAttribute("position", ".1 .1 .1" )
-            this.RightBeam.setAttribute("material", "opacity: .8; color: green")
-            this.RightBeam.setAttribute("animation", "property: position; to: .1 -1 .1; dur: 200; " +
-                "easing: linear; loop: 15")
-
-            this.LeftBeam.setAttribute("position", "-.1 .1 .1" )
-            this.LeftBeam.setAttribute("material", "opacity: .8; color: green")
-            this.LeftBeam.setAttribute("animation", "property: position; to: -.1 -1 .1; dur: 200; " +
-                "easing: linear; loop: 15")
-        } else if(computerCard.Weight > playerCard.Weight) {
-            this.playerShip.setAttribute("animation__3", "property: visible; from: true; to: false; delay: 4000")
-
-            this.RightBeam.setAttribute("position", ".1 -1 .1" )
-            this.RightBeam.setAttribute("material", "opacity: .8; color: red")
-            this.RightBeam.setAttribute("animation", "property: position; to: .1 .1 .1; dur: 200; " +
-                "easing: linear; loop: 15")
-
-            this.LeftBeam.setAttribute("position", "-.1 -1 .1" )
-            this.LeftBeam.setAttribute("material", "opacity: .8; color: red")
-            this.LeftBeam.setAttribute("animation", "property: position; to: -.1 .1 .1; dur: 200; " +
-                "easing: linear; loop: 15")
-        }
 
         this.playerTarget.appendChild(this.playerShip)
+        this.playerTarget.appendChild(this.computerShip)
         this.playerTarget.appendChild(this.RightBeam)
         this.playerTarget.appendChild(this.LeftBeam)
-        this.playerTarget.appendChild(this.computerShip)
+    },
+
+    runAnimation: function(playerCard, computerCard) {
+        this.computerShip.removeAttribute("animation__2")
+        this.playerShip.removeAttribute("animation__2")
+        this.computerShip.removeAttribute("animation__3")
+        this.playerShip.removeAttribute("animation__3")
+        this.RightBeam.removeAttribute("animation__2")
+        this.RightBeam.removeAttribute("animation__3")
+        this.LeftBeam.removeAttribute("animation__2")
+        this.LeftBeam.removeAttribute("animation__3")
+
+        this.playerShip.setAttribute("visible", "true")
+        this.computerShip.setAttribute("visible", "true")
+        this.RightBeam.setAttribute("visible", "true")
+        this.LeftBeam.setAttribute("visible", "true")
+
+        //this.RightBeam.setAttribute("animation__2", "property: visible; from: false; to: true; delay: 1000")
+        this.RightBeam.setAttribute("animation__3", "property: visible; from: true; to: false; delay: 3000")
+        //this.LeftBeam.setAttribute("animation__2", "property: visible; from: false; to: true; delay: 1000")
+        this.LeftBeam.setAttribute("animation__3", "property: visible; from: true; to: false; delay: 3000")
+
+        if(playerCard.Weight > computerCard.Weight) {
+            this.playerShip.setAttribute("animation__2", "property: visible; from: true; to: false; delay: 7000")
+            this.computerShip.setAttribute("animation__3", "property: visible; from: true; to: false; delay: 4000")
+
+            this.RightBeam.setAttribute("position", ".1 .2 .1" )
+            this.RightBeam.setAttribute("material", "opacity: .8; color: green")
+            this.RightBeam.setAttribute("animation", "property: position; to: .1 -1 .1; dur: 300; " +
+                "easing: linear; loop: true")
+
+            this.LeftBeam.setAttribute("position", "-.1 .2 .1" )
+            this.LeftBeam.setAttribute("material", "opacity: .8; color: green")
+            this.LeftBeam.setAttribute("animation", "property: position; to: -.1 -1 .1; dur: 300; " +
+                "easing: linear; loop: true")
+        } else if(computerCard.Weight > playerCard.Weight) {
+            this.computerShip.setAttribute("animation__2", "property: visible; from: true; to: false; delay: 7000")
+            this.playerShip.setAttribute("animation__3", "property: visible; from: true; to: false; delay: 4000")
+
+            this.RightBeam.setAttribute("position", ".1 -1.2 .1" )
+            this.RightBeam.setAttribute("material", "opacity: .8; color: red")
+            this.RightBeam.setAttribute("animation", "property: position; to: .1 .2 .1; dur: 300; " +
+                "easing: linear; loop: true")
+
+            this.LeftBeam.setAttribute("position", "-.1 -1.2 .1" )
+            this.LeftBeam.setAttribute("material", "opacity: .8; color: red")
+            this.LeftBeam.setAttribute("animation", "property: position; to: -.1 .2 .1; dur: 300; " +
+                "easing: linear; loop: true")
+        }
+
+
     }
 });
