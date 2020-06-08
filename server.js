@@ -8,16 +8,14 @@ const options = {
 const https = require('https').createServer(options, app).listen(443);
 const io = require('socket.io')(https);
 const connections = [];
-
+/* Use to log every request
 app.use((req, res, next) => {
 	console.log('Request for:', req.url);
 	next();
 });
-
+*/
 // Setup static file server
 app.use(express.static('public'));
-
-var started = false;
 
 const suits = ["s", "h", "d", "c"];
 const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
@@ -26,11 +24,12 @@ const deck = [];
 const players = [];
 
 function createDeck() {
+	deck.length = 0;
 	for (let i = 0; i < values.length; i++) {
 		for (let x = 0; x < suits.length; x++) {
 			let weight = parseInt(values[i]);
 			if (values[i] == "J")
-				weight = 10;
+				weight = 11;
 			if (values[i] == "Q")
 				weight = 12;
 			if (values[i] == "K")
@@ -44,6 +43,7 @@ function createDeck() {
 }
 
 function createPlayers(num) {
+	players.length = 0;
 	for (let i = 1; i <= num; i++) {
 		const player = {Name: 'Player ' + i, ID: i, Hand: [], Placed: []};
 		players.push(player);
@@ -102,7 +102,7 @@ function placeCard(playerNum) {
 		return null;
 	}
 	const card = players[playerNum].Hand.shift();
-	const result = {card: card, offset: players[playerNum].Placed.length * 0.05, back: false, clear: true}
+	const result = {card: card, offset: players[playerNum].Placed.length * 0.05, back: false, clear: true, winner: -1};
 	for (let i  = 0; i < players.length; ++i) {
 		if (players[i].Placed.length > 0) {
 			result.clear = false;
@@ -127,24 +127,33 @@ function placeCard(playerNum) {
 	const card1 = players[1].Placed.pop();
 	players[0].Placed.push(card0);
 	players[1].Placed.push(card1);
-	let winner = card0.Weight - card1.Weight;
-	if (winner > 0) {
-		winner = 0;
-	} else if (winner < 0) {
-		winner = 1;
+	result.winner = card0.Weight - card1.Weight;
+	if (result.winner > 0) {
+		result.winner = 0;
+	} else if (result.winner < 0) {
+		result.winner = 1;
 	} else {
-		winner = -1;
+		result.winner = -1;
 	}
-	if (winner == -1) {
+	if (result.winner == -1) {
 		// War!
 		console.log('War!');
 	} else {
-		players[winner].Hand.push.apply(players[winner].Hand, players[0].Placed.concat(players[1].Placed));
 		for (let i = 0; i < players.length; ++i) {
+			players[result.winner].Hand.push.apply(players[result.winner].Hand, players[i].Placed);
 			players[i].Placed.length = 0;
 		}
 	}
 	return result;
+}
+
+function getWinner() {
+	for (let i = 0; i < players.length; ++i) {
+		if (players[i].Hand.length == 52) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 io.on('connection', (socket) => {
@@ -155,18 +164,22 @@ io.on('connection', (socket) => {
 		if (!started) {
 			return;
 		}
-		const card = placeCard(playerNum);
-		if (card != null) {
-			socket.emit('card', card);
+		const cardData = placeCard(playerNum);
+		if (cardData != null) {
+			const winner = cardData.winner;
 			for (let i = 0; i < connections.length; ++i) {
-				if (connections[i].id == socket.id) {
-					continue;
-				}
-				connections[i].emit('opponent', card);
+				cardData.handCount = players[i].Hand.length;
+				cardData.winner = winner == -1 ? -1 : winner == i;
+				cardData.player = i == playerNum
+				socket.emit('card', cardData);
 			}
 		}
-		console.log('Player 0:', players[0].Hand.length);
-		console.log('Player 1:', players[1].Hand.length);
+		const winner = getWinner();
+		if (winner != -1) {
+			for (let i = 0; i < connections.length; ++i) {
+				connections[i].emit('end', {won: winner == playerNum});
+			}
+		}
 	});
 	socket.on('disconnect', () => {
 		console.log('A user disconnected');
@@ -178,9 +191,12 @@ io.on('connection', (socket) => {
 		}
 		console.log(connections);
 	});
-	if (connections.length == 2 && !started) {
-		started = true;
+	// TODO: Remove hardcode on 2 player game
+	if (connections.length == 2) {
 		startGame();
+		for (let i = 0; i < connections.length; ++i) {
+			connections[i].emit('start', {});
+		}
 	}
 });
 

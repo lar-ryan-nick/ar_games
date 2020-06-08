@@ -75,6 +75,8 @@
 				<img id="h_a" src="/images/h_a.svg"/>
 				<img id="s_a" src="/images/s_a.svg"/>
 				<img id="back" src="/images/back.png"/>
+				<a-asset-item id="tie-fighter-obj" src="/models/tie_fighter.obj"></a-asset-item>
+				<a-asset-item id="tie-fighter-mtl" src="/models/tie_fighter.mtl"></a-asset-item>
       </a-assets>
 
       <!-- The raycaster will emit mouse events on scene objects specified with the cantap class -->
@@ -94,15 +96,18 @@
 
       <a-light type="ambient" intensity="1"></a-light>
 
-
 			<!-- Note: "name:" must be set to the name of the image target uploaded to the 8th Wall Console -->
 			<a-entity xrextras-named-image-target="name: red_card"
 			id="player_card" class=".cantap">
-				<a-text id="player-text" rotation="0 0 180" width=1 position="0.4 -0.5 0" color="black" value="Tap here to place a card from your deck"></a-text>
+				<a-text id="player-text" rotation="0 0 180" width=1 position="0.4 -0.5 0" color="black" value="Waiting for a player to join..."></a-text>
 				<a-box id="player-tappable" class="cantap" visible="false"></a-box>
-			</a-entity>
-			<a-entity xrextras-named-image-target="name: blue_card"
-			id="computer_card">
+				<a-image class="noremove" src="#back" scale=".25 .25 1" position="-.5 .6 0">
+					<a-text id="card-count" rotation="0 0 180" width="9" color="black" align="center" value="26"></a-text>
+				</a-image>
+				<a-obj-model id="player-ship" src="#tie-fighter-obj" mtl="#tie-fighter-mtl" scale=".15 .15 .15" position=".05 .1 .2" rotation="90 0 0" visible="false"></a-obj-model>
+				<a-obj-model id="opponent-ship" src="#tie-fighter-obj" mtl="#tie-fighter-mtl" scale=".15 .15 .15" position=".05 -1 .2" rotation="-90 0 0" visible="false"></a-obj-model>
+				<a-cylinder id="left-beam" height=".2" radius=".01" visible="false"></a-cylinder>
+				<a-cylinder id="right-beam" height=".2" radius=".01" visible="false"></a-cylinder>
 			</a-entity>
 
 		</a-scene>

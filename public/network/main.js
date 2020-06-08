@@ -3,134 +3,112 @@ var currentPlayer = 0;
 AFRAME.registerComponent('main', {
 	init: function() {
 		this.playerTarget = document.getElementById('player_card')
-		this.computerTarget = document.getElementById('computer_card')
 		this.playerText = document.getElementById('player-text')
+		this.countText = document.getElementById('card-count')
+		this.playerShip = document.getElementById('player-ship');
+		this.opponentShip = document.getElementById('opponent-ship');
+		this.leftBeam = document.getElementById('left-beam');
+		this.rightBeam = document.getElementById('right-beam');
 
-		this.flipCards = this.flipCards.bind(this)
-		this.startWar = this.startWar.bind(this)
-		this.checkForWinner = this.checkForWinner.bind(this)
-		this.clearCards = this.clearCards.bind(this)
 		this.placeCard = this.placeCard.bind(this)
+		this.clearCards = this.clearCards.bind(this);;
+		this.runAnimation = this.runAnimation.bind(this);
 
 		this.socket = io.connect('https://fog.mat.ucsb.edu')
 		this.socket.on('start', (data) => {
+			this.playerText.setAttribute('value', 'The game has started');
 		})
-		this.socket.on('opponent', (data) => {
+		this.socket.on('card', (data) => {
 			if (data.clear) {
-				this.clearCards(this.playerTarget)
-				this.clearCards(this.computerTarget)
+				this.clearCards();
 			}
-			this.placeCard(this.computerTarget, data.card, data.offset, data.back);
+			this.placeCard(data.player, data.card, data.offset, data.back);
+			this.countText.setAttribute('value', data.handCount);
+			if (data.winner >= 0) {
+				this.runAnimation(data.winner, data.offset);
+			}
 		})
-		this.socket.on('card', function(data) {
-			if (data.clear) {
-				this.clearCards(this.playerTarget)
-				this.clearCards(this.computerTarget)
+		this.socket.on('end', (data) => {
+			if (data.won) {
+				this.playerText.setAttribute('value', 'You win!');
+				continue;
 			}
-			this.placeCard(this.playerTarget, data.card, data.offset, data.back);
-		}.bind(this))
+			this.playerText.setAttribute('value', 'You lose');
+		});
 
 		const playerTappable = document.getElementById('player-tappable')
-		playerTappable.addEventListener('click', function(event) {
+		playerTappable.addEventListener('click', (event) => {
 			this.socket.emit('card', {});
-		}.bind(this))
+		})
 	},
 
-	flipCards: function() {
-
-		playersCard = this.players[0].Hand.shift();
-		computersCard = this.players[1].Hand.shift();
-
-		console.log(playersCard)
-
-		this.placeCard(this.playerTarget, playersCard, 0, false);
-		this.placeCard(this.computerTarget, computersCard, 0, false);
-
-		if (playersCard.Weight == computersCard.Weight) {
-			// If cards are the same rank begin a war and add the two cards to the pot
-			var warPot = new Array()
-			warPot.push(playersCard)
-			warPot.push(computersCard)
-			this.startWar(warPot)
-		} else if (playersCard.Weight > computersCard.Weight) {
-			// If the player has a higher rank card, add both cards to the bottom of their hand
-			this.players[0].Hand.push(playersCard)
-			this.players[0].Hand.push(computersCard)
-			this.checkForWinner()
-		} else {
-			// If the computer has a higher rank card, add both cards to the bottom of their hand
-			this.players[1].Hand.push(playersCard)
-			this.players[1].Hand.push(computersCard)
-			this.checkForWinner()
-		}
-				console.log(this.players[0].Hand)
-				console.log(this.players[1].Hand)
-	},
-
-	placeCard: function(target, card, offset, back) {
+	placeCard: function(isPlayer, card, offset, back) {
 		const image = document.createElement('a-image')
 		image.object3D.scale.set(0.75, 0.75, 0.75)
-		image.object3D.position.set(0, offset, offset)
+		let xOffset = 0;
+		let yOffset = offset;
+		let zOffset = offset;
+		if (!isPlayer) {
+			yOffset -= 1
+		}
+		image.object3D.position.set(xOffset, yOffset, zOffset)
 		if (!back) {
 			image.setAttribute('src', "#" + card.Suit + "_" + card.Value.toLowerCase())
 		} else {
 			image.setAttribute('src', "#back")
 		}
-		target.appendChild(image)
+		this.playerTarget.appendChild(image)
 	},
 
-	clearCards: function(target) {
-		target.querySelectorAll('a-image').forEach(element => {
-			console.log(element)
-			target.removeChild(element)
+	clearCards: function() {
+		this.playerShip.object3D.visible = false;
+		this.opponentShip.object3D.visible = false;
+		this.leftBeam.object3D.visible = false;
+		this.rightBeam.object3D.visible = false;
+		this.playerShip.removeAttribute('animation');
+		this.opponentShip.removeAttribute('animation');
+		this.leftBeam.removeAttribute('animation');
+		this.rightBeam.removeAttribute('animation');
+		this.leftBeam.removeAttribute('animation__2');
+		this.rightBeam.removeAttribute('animation__2');
+		this.playerTarget.querySelectorAll('a-image').forEach(element => {
+			if (element.className != 'noremove') {
+				this.playerTarget.removeChild(element)
+			}
 		})
 	},
 
-	startWar: function(warPot) {
-		// Check if both players have enough cards for the war
-		if (this.players[0].Hand.length < 3) {
-			// Computer wins
-						this.playerText.setAttribute('value', 'Not enough cards for war. You lose.')
-		}
-		if (this.players[1].Hand.length < 3) {
-			// Player wins
-						this.playerText.setAttribute('value', 'Opponent ran out of cards for war. You won!')
-		}
+	runAnimation: function(playerWon, offset) {
+		this.playerShip.object3D.position.z = (.2 + offset)
+		this.opponentShip.object3D.position.z = (.2 + offset)
+		this.playerShip.object3D.visible = true;
+		this.opponentShip.object3D.visible = true;
+		this.leftBeam.object3D.visible = true;
+		this.rightBeam.object3D.visible = true;
 
-				for (var i = 0; i < 3; ++i) {
-					var playersCard = this.players[0].Hand.shift();
-					var computersCard = this.players[1].Hand.shift();
-					warPot.push(playersCard)
-					warPot.push(computersCard)
-					this.placeCard(this.playerTarget, playersCard, warPot.length / 2 * 0.1, i != 2);
-					this.placeCard(this.computerTarget, computersCard, warPot.length / 2 * 0.1, i != 2);
-				}
+		this.leftBeam.setAttribute("animation__2", "property: visible; from: true; to: false; delay: 3000")
+		this.rightBeam.setAttribute("animation__2", "property: visible; from: true; to: false; delay: 3000")
 
-				console.log('WAR!')
-				console.log(warPot)
+		if (playerWon) {
+			this.opponentShip.setAttribute('animation', 'property: visible; from: true; to: false; delay: 3000');
 
-		if (playersCard.Weight == computersCard.Weight) {
-			// If cards are the same rank continue the war and add the two cards to the pot
-			this.startWar(warPot)
-		} else if (playersCard.Weight > computersCard.Weight) {
-			// If the player has a higher rank card, add the pot to the bottom of their hand
-			this.players[0].Hand.push.apply(this.players[0].Hand, warPot)
-			this.checkForWinner()
+			this.rightBeam.setAttribute("position", ".1 .1 " + (.1 + offset))
+			this.rightBeam.setAttribute("material", "opacity: .8; color: green")
+			this.rightBeam.setAttribute("animation", "property: position; to: .1 -1 " + (.1 + offset) + "; dur: 200; easing: linear; loop: true")
+
+			this.leftBeam.setAttribute("position", "-.1 .1 " + (.1 + offset))
+			this.leftBeam.setAttribute("material", "opacity: .8; color: green")
+			this.leftBeam.setAttribute("animation", "property: position; to: -.1 -1 " + (.1 + offset) + "; dur: 200; easing: linear; loop: true")
 		} else {
-			// If the computer has a higher rank card, add the pot to the bottom of their hand
-			this.players[1].Hand.push.apply(this.players[1].Hand, warPot)
-			this.checkForWinner()
-		}
-	},
+			this.playerShip.setAttribute('animation', 'property: visible; from: true; to: false; delay: 3000');
 
-	checkForWinner: function() {
-		if (this.players[0].Hand.length == 52) {
-			//TODO: display player win
-						this.playerText.setAttribute('value', 'You won!')
-		}
-		if (this.players[1].Hand.length == 52) {
-			//TODO: display computer win
-						this.playerText.setAttribute('value', 'You lost.')
+			this.rightBeam.setAttribute("position", ".1 -1 " + (.1 + offset))
+			this.rightBeam.setAttribute("material", "opacity: .8; color: red")
+			this.rightBeam.setAttribute("animation", "property: position; to: .1 .1 " + (.1 + offset) + "; dur: 200; easing: linear; loop: true")
+
+			this.leftBeam.setAttribute("position", "-.1 -1 " + (.1 + offset))
+			this.leftBeam.setAttribute("material", "opacity: .8; color: red")
+			this.leftBeam.setAttribute("animation", "property: position; to: -.1 .1 " + (.1 + offset) + "; dur: 200; easing: linear; loop: true")
 		}
 	}
 });
