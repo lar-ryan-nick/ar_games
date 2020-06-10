@@ -10,14 +10,14 @@ AFRAME.registerComponent('main', {
 		this.leftBeam = document.getElementById('left-beam');
 		this.rightBeam = document.getElementById('right-beam');
 
-		this.placeCard = this.placeCard.bind(this)
-		this.clearCards = this.clearCards.bind(this);;
+		this.placeCard = this.placeCard.bind(this);
+		this.clearCards = this.clearCards.bind(this);
 		this.runAnimation = this.runAnimation.bind(this);
 
-		this.socket = io.connect('https://fog.mat.ucsb.edu')
+		this.socket = io.connect('https://fog.mat.ucsb.edu');
 		this.socket.on('start', (data) => {
 			this.playerText.setAttribute('value', 'The game has started');
-		})
+		});
 		this.socket.on('card', (data) => {
 			if (data.clear) {
 				this.clearCards();
@@ -27,11 +27,11 @@ AFRAME.registerComponent('main', {
 			if (data.winner >= 0) {
 				this.runAnimation(data.winner, data.offset);
 			}
-		})
+		});
 		this.socket.on('end', (data) => {
 			if (data.won) {
 				this.playerText.setAttribute('value', 'You win!');
-				continue;
+				return;
 			}
 			this.playerText.setAttribute('value', 'You lose');
 		});
@@ -39,7 +39,7 @@ AFRAME.registerComponent('main', {
 		const playerTappable = document.getElementById('player-tappable')
 		playerTappable.addEventListener('click', (event) => {
 			this.socket.emit('card', {});
-		})
+		});
 	},
 
 	placeCard: function(isPlayer, card, offset, back) {
@@ -79,6 +79,13 @@ AFRAME.registerComponent('main', {
 	},
 
 	runAnimation: function(playerWon, offset) {
+		this.playerShip.removeAttribute('animation');
+		this.opponentShip.removeAttribute('animation');
+		this.leftBeam.removeAttribute('animation');
+		this.rightBeam.removeAttribute('animation');
+		this.leftBeam.removeAttribute('animation__2');
+		this.rightBeam.removeAttribute('animation__2');
+
 		this.playerShip.object3D.position.z = (.2 + offset)
 		this.opponentShip.object3D.position.z = (.2 + offset)
 		this.playerShip.object3D.visible = true;

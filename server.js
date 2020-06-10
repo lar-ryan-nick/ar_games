@@ -82,6 +82,9 @@ function startGame() {
 }
 
 function canPlace(playerNum) {
+	if (players.length <= playerNum) {
+		return false;
+	}
 	// TODO: check hand
 	if (players[playerNum].Placed.length % 3 != 1) {
 		return true;
@@ -161,9 +164,6 @@ io.on('connection', (socket) => {
 	connections.push(socket);
 	console.log('A user connected to socket.io');
 	socket.on('card', (data) => {
-		if (!started) {
-			return;
-		}
 		const cardData = placeCard(playerNum);
 		if (cardData != null) {
 			const winner = cardData.winner;
@@ -171,7 +171,7 @@ io.on('connection', (socket) => {
 				cardData.handCount = players[i].Hand.length;
 				cardData.winner = winner == -1 ? -1 : winner == i;
 				cardData.player = i == playerNum
-				socket.emit('card', cardData);
+				connections[i].emit('card', cardData);
 			}
 		}
 		const winner = getWinner();
